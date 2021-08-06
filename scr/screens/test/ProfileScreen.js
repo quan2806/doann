@@ -46,7 +46,6 @@ const MoreScreen = () => {
         <ProfileItem icon="account" name="My Profile" />
         <ProfileItem icon="equalizer" name="Analysis" />
         <ProfileItem icon="cog" name="Settings" />
-        <ProfileItem icon="help" name="Help" />
       </View>
     </View>
   );

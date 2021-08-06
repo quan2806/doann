@@ -1,93 +1,118 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Button,
-  TextInput,
-  Image,
-  SafeAreaView,
-} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, Text, StyleSheet, Button, Image} from 'react-native';
 import {ratioW} from '../utils';
 import {images, colors} from '../assets';
+import Header from './test/HeaderComponent';
+import {useSelector} from 'react-redux';
+import {Login, ProfileUser} from '../api/user/Info';
 
-const UserProfile = props => {
+function UserProfile({navigation}) {
+  const [data, setData] = useState();
+  const [data2, setData2] = useState();
+  const idUser = useSelector(state => state?.userReducer?.idUser);
+  //const user = {ID: 1, Name: 'Quan', Age: 22, Sex: 'Male', Phone: '0936361083'};
+  useEffect(() => {
+    ProfileUser(idUser, 'GET', null).then(res => {
+      setData(res.data);
+      //console.log(res.data);
+    });
+    // Login('Name=Thanh&Pass=123123', 'GET', null).then(res => {
+    //   setData2(res.data);
+    //   console.log(res.data);
+    // });
+  }, [idUser]);
+  if (data == null) {
+    return null;
+  }
   return (
     <View style={styles.container}>
-      <SafeAreaView />
+      <Header title="Profile" />
       <View style={styles.avatarContainer}>
         <View>
           <Image style={styles.avatarUser} source={images.img_shiba} />
         </View>
-        <Text style={styles.nameOfUser}>ShibaInu</Text>
+        <Text style={styles.nameOfUser}>{data[0].Name}</Text>
       </View>
       <View style={styles.headerbox}>
-        <Text style={styles.headerText}>Personal Details</Text>
+        <Text style={styles.headerText}>Thông tin cá nhân</Text>
         <View style={styles.editbutton}>
-          <Button onPress={() => {}} color="black" title="Edit Info" />
+          <Button
+            onPress={() => {
+              navigation.navigate('EditProfile');
+            }}
+            color="black"
+            title="Sửa thông tin"
+          />
         </View>
       </View>
       <View style={styles.detailsBox}>
         <View style={styles.innerBox}>
           <View style={styles.detailsText}>
-            <Text style={styles.detailName}>Name</Text>
-            <Text style={styles.detail}></Text>
+            <Text style={styles.detailName}>Tên</Text>
+            <Text style={styles.detail}>{data[0].Name}</Text>
           </View>
         </View>
         <View style={styles.innerBox}>
           <View style={styles.detailsText}>
-            <Text style={styles.detailName}>Height</Text>
-            <Text style={styles.detail}>
-              {props.feet + ' ft, ' + props.inches + ' in'}
-            </Text>
+            <Text style={styles.detailName}>Mật khẩu</Text>
+            <Text style={styles.detail}>{data[0].Pass}</Text>
+          </View>
+        </View>
+        {/*<View style={styles.innerBox}>*/}
+        {/*  <View style={styles.detailsText}>*/}
+        {/*    <Text style={styles.detailName}>Chiều cao</Text>*/}
+        {/*    <Text style={styles.detail}>*/}
+        {/*      cm*/}
+        {/*      /!*{props.feet + ' cm '}*!/*/}
+        {/*    </Text>*/}
+        {/*  </View>*/}
+        {/*</View>*/}
+        <View style={styles.innerBox}>
+          <View style={styles.detailsText}>
+            <Text style={styles.detailName}>Giới tính</Text>
+            <Text style={styles.detail}>{data[0].Sex}</Text>
           </View>
         </View>
         <View style={styles.innerBox}>
           <View style={styles.detailsText}>
-            <Text style={styles.detailName}>Gender</Text>
-            <Text style={styles.detail}>{props.gender}</Text>
+            <Text style={styles.detailName}>Tuổi</Text>
+            <Text style={styles.detail}>{data[0].Age}</Text>
           </View>
         </View>
-        <View style={styles.innerBox}>
-          <View style={styles.detailsText}>
-            <Text style={styles.detailName}>Age</Text>
-            <Text style={styles.detail}>{props.age}</Text>
-          </View>
+        {/*<View style={styles.innerBox}>*/}
+        {/*  <View style={styles.detailsText}>*/}
+        {/*    <Text style={styles.detailName}>Cân nặng</Text>*/}
+        {/*    <Text style={styles.detail} />*/}
+        {/*  </View>*/}
+        {/*</View>*/}
+      </View>
+      <View style={styles.buttonContainer}>
+        <View
+          style={{...styles.buttonInner, backgroundColor: 'rgb(0, 153, 204)'}}>
+          <Button
+            onPress={() => {
+              navigation.navigate('Info');
+            }}
+            color="black"
+            title="Tính toán calo cần thiết"
+          />
         </View>
-        <View style={styles.innerBox}>
-          <View style={styles.detailsText}>
-            <Text style={styles.detailName}>Weight</Text>
-            <Text style={styles.detail}>{props.weight}</Text>
-          </View>
-        </View>
-        <View style={styles.innerBox}>
-          <View style={styles.detailsText}>
-            <Text style={styles.detailName}>Recommended Calories</Text>
-            <Text style={styles.detail}>{props.calories}</Text>
-          </View>
-        </View>
-        <View style={styles.innerBox}>
-          <View style={styles.detailsText}>
-            <Text style={styles.detailName}>Recommended Protein</Text>
-            <Text style={styles.detail}>{props.protein}</Text>
-          </View>
-        </View>
-        <View style={styles.innerBox}>
-          <View style={styles.detailsText}>
-            <Text style={styles.detailName}>Recommended Fats</Text>
-            <Text style={styles.detail}>{props.fats}</Text>
-          </View>
-        </View>
-        <View style={styles.innerBox}>
-          <View style={styles.detailsText}>
-            <Text style={styles.detailName}>Recommended Carbohydrates</Text>
-            <Text style={styles.detail}>{props.carbs}</Text>
-          </View>
+        <View style={styles.buttonInner}>
+          <Button
+            onPress={() => {
+              //await props.logOut();
+              navigation.replace('SignIn');
+            }}
+            color="black"
+            title="Đăng xuất"
+          />
         </View>
       </View>
     </View>
   );
-};
+}
+
+export default UserProfile;
 
 const styles = StyleSheet.create({
   container: {
@@ -107,20 +132,20 @@ const styles = StyleSheet.create({
     bottom: '2%',
   },
   avatarUser: {
-    height: ratioW(150),
-    width: ratioW(150),
+    height: ratioW(120),
+    width: ratioW(120),
     borderRadius: ratioW(80),
   },
   nameOfUser: {
     fontSize: 28,
     fontWeight: 'bold',
     color: colors.colorTextThird,
-    marginTop: ratioW(15),
+    marginTop: ratioW(10),
   },
   avatarContainer: {
-    marginTop: ratioW(35),
+    marginTop: ratioW(20),
     alignItems: 'center',
-    marginBottom: ratioW(20),
+    // marginBottom: ratioW(5),
   },
   detailsBox: {
     backgroundColor: 'rgb(250, 247, 247)',
@@ -147,10 +172,8 @@ const styles = StyleSheet.create({
   },
   buttonInner: {
     backgroundColor: 'red',
-    width: '50%',
+    width: '60%',
     height: '15%',
     marginBottom: '5%',
   },
 });
-
-export default UserProfile;

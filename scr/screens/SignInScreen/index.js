@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -16,7 +16,33 @@ const {height, width} = Dimensions.get('window');
 import {colors, icons, images} from '../../assets';
 import {ratioW} from '../../utils';
 import {BlurView} from '@react-native-community/blur';
-const SignInScreen = () => {
+import {Login} from '../../api/user/Info';
+import {useDispatch, useSelector} from 'react-redux';
+const SignInScreen = ({navigation}) => {
+  const [name, setName] = useState();
+  const [pass, setPass] = useState();
+  const idUser = useSelector(state => state?.userReducer?.idUser);
+  const dispatch = useDispatch();
+  function id(idUser) {
+    dispatch({
+      type: 'ACCOUNT',
+      idUser: idUser,
+    });
+  }
+  function check(name, pass) {
+    if (name == undefined && pass == undefined) {
+      alert('Nhập thông tin tài khoản và mật khẩu!');
+    } else {
+      Login(`Name=${name}&Pass=${pass}`, 'GET', null).then(res => {
+        if (name == res.data[0].Name && pass == res.data[0].Pass) {
+          id(res.data[0].ID);
+          navigation.replace('TabNavigation');
+        } else {
+          alert('Sai');
+        }
+      });
+    }
+  }
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.signInContainer}>
@@ -36,7 +62,7 @@ const SignInScreen = () => {
         <KeyboardAvoidingView behavior="position">
           <View style={styles.bodyContainer}>
             <View style={styles.logoContainer}>
-              <Image source={images.logo_jc_house} style={styles.logo} />
+              {/*<Image source={images.logo_jc_house} style={styles.logo} />*/}
             </View>
             <View style={styles.contentContainer}>
               <View style={[styles.input]}>
@@ -44,10 +70,8 @@ const SignInScreen = () => {
                 <TextInput
                   autoCapitalize="none"
                   style={styles.textInputStyle}
-                  // onSubmitEditing={e => {
-                  //   passwordRef.current?.focus();
-                  // }}
-                  // onChangeText={text => setUsername(text.trim())}
+                  onChangeText={setName}
+                  //value={name}
                 />
               </View>
               <View style={[styles.input, {marginTop: ratioW(10)}]}>
@@ -58,16 +82,26 @@ const SignInScreen = () => {
                 <TextInput
                   // ref={passwordRef}
                   style={styles.textInputStyle}
-                  // secureTextEntry={true}
-                  // onChangeText={text => setPassword(text.trim())}
+                  secureTextEntry={true}
+                  onChangeText={setPass}
+                  //value={pass}
                   // onSubmitEditing={handleLogin}
                 />
               </View>
-              <TouchableOpacity style={styles.btnStyle}>
+              <TouchableOpacity
+                onPress={() => check(name, pass)}
+                // onPress={() => {
+                //   navigation.replace('TabNavigation');
+                // }}
+                style={styles.btnStyle}>
                 <Text style={styles.textButton}>Đăng nhập</Text>
               </TouchableOpacity>
               <Text style={styles.orText}>hoặc</Text>
-              <TouchableOpacity style={styles.btnStyle}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('SignUp');
+                }}
+                style={styles.btnStyle}>
                 <Text style={styles.textButton}>Tạo tài khoản</Text>
               </TouchableOpacity>
             </View>

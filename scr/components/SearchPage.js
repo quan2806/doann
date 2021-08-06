@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,18 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from 'react-native';
+import Result from './Result';
 
-const SearchPage = () => {
+const SearchPage = props => {
+  const IdM = props.route.params.IdM;
+  const Meal = props.route.params.Meal;
+  const date = props.route.params.date;
+  const [searchText, setSearch] = useState('');
+  //console.log(props);
   return (
     <View style={styles.container}>
       <SafeAreaView />
-      <View style={styles.headerContainer}></View>
+      <View style={styles.headerContainer} />
       <View style={styles.searchBarOuter}>
         <View style={styles.inputBox}>
           <TextInput
@@ -23,11 +29,19 @@ const SearchPage = () => {
             placeholderTextColor={'black'}
             style={styles.searchbar}
             clearButtonMode="always"
+            defaultValue={searchText}
+            onChangeText={text => setSearch(text)}
           />
         </View>
       </View>
       <ScrollView style={styles.listFoodContainer}>
-
+        <Result
+          navigation={props.navigation}
+          IdM={IdM}
+          Meal={Meal}
+          date={date}
+          search={searchText}
+        />
       </ScrollView>
     </View>
   );

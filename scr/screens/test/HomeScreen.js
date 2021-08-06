@@ -1,21 +1,65 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import HomeSectionComponent from '../../components/test/HomeSectionComponent';
-import {StyleSheet, ScrollView, View, Text, StatusBar} from 'react-native';
-
+import {StyleSheet, View, StatusBar, FlatList, Text} from 'react-native';
+import {
+  LineChart,
+  BarChart,
+  PieChart,
+  ProgressChart,
+  ContributionGraph,
+  StackedBarChart,
+} from 'react-native-chart-kit';
+import {Dimensions} from 'react-native';
+const screenWidth = Dimensions.get('window').width;
 import Header from '../../components/test/HeaderComponent';
-import Meal from '../../components/test/MealComponent';
+import HomeProgressBar from '../../components/HomeProgressBar';
+import {Chart} from '../../api/user/Info';
+import {useSelector} from 'react-redux';
+const ReportItem = ({item}) => {
+  return (
+    <View style={{flexDirection: 'row', marginBottom: 10, height: 30}}>
+      <View style={{justifyContent: 'center', alignItems: 'center'}}>
+        <Text>{item.Time.slice(5, 10)}:</Text>
+      </View>
+      <View style={[styles.total, {width: item.Weight}]} />
+      <View style={{justifyContent: 'center', alignItems: 'center'}}>
+        <Text>{item.Weight} kg</Text>
+      </View>
+    </View>
+  );
+};
 
 const HomeScreen = () => {
+  const idUser = useSelector(state => state?.userReducer?.idUser);
+  //console.log(idUser);
+  const [chart, setChart] = useState();
+  useEffect(() => {
+    Chart(idUser, 'GET', null).then(res => {
+      setChart(res.data);
+      //console.log(res.data);
+    });
+  }, [idUser]);
+  if (chart == null) {
+    return null;
+  }
   return (
     <View style={styles.screenContainer}>
       <StatusBar barStyle="light-content" />
-      <Header title={'Home'} />
+      <Header title={'Thống kê'} />
       <View style={styles.bodyContainer}>
-        <HomeSectionComponent />
-        <ScrollView>
-          <Meal text={'Breakfast'}></Meal>
-          <Meal text={'Lunch'}></Meal>
-        </ScrollView>
+        {/*/!*<HomeSectionComponent />*!/*/}
+        <HomeProgressBar />
+        <View>
+          <Text style={styles.sectionTitle}>Lịch sử cân nặng</Text>
+        </View>
+        <FlatList
+          data={chart}
+          style={styles.list}
+          keyExtractor={item => item.Time}
+          renderItem={({item}) => {
+            return <ReportItem item={item} />;
+          }}
+        />
       </View>
     </View>
   );
@@ -25,6 +69,7 @@ const styles = StyleSheet.create({
   //
   bodyContainer: {
     backgroundColor: '#fff',
+    flex: 1,
   },
   screenContainer: {
     flex: 1,
@@ -41,6 +86,27 @@ const styles = StyleSheet.create({
     color: '#2f2f2f',
     marginVertical: 12,
     paddingHorizontal: 12,
+  },
+  total: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 500,
+    height: '100%',
+    backgroundColor: '#ccc',
+    marginHorizontal: 10,
+    borderRadius: 5,
+  },
+  list: {
+    marginTop: 10,
+    marginLeft: 20,
+  },
+  sectionTitle: {
+    fontWeight: '700',
+    fontSize: 16,
+    color: '#2f2f2f',
+    marginVertical: 12,
+    paddingTop: 8,
+    marginLeft: 10,
   },
 });
 
